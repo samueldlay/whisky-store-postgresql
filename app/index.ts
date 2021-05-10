@@ -27,7 +27,7 @@ app.use(cors());
 
 whiskys.use(lib.logResponse);
 
-app.get('/', (req: any, res: {send: (arg0: string) => void;}) => {
+app.get('/', <MiddlewareFn>function(req, res) {
   res.send('Welcome to the Whiskey Store. Navigate to \'/whiskys\' to view the current JSON data.');
 });
 
