@@ -6,6 +6,8 @@ const helpers = require('./helpers');
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const {pool} = require('./config')
+import {MiddlewareFn} from './my-types'
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,10 +28,10 @@ app.use(cors());
 whiskys.use(lib.logResponse);
 
 app.get('/', (req: any, res: {send: (arg0: string) => void;}) => {
-  res.send('Welcome to the JSON Manipulator. Navigate to \'/whiskys\' to view the current JSON data.');
+  res.send('Welcome to the Whiskey Store. Navigate to \'/whiskys\' to view the current JSON data.');
 });
 
-whiskys.get('/', (req: any, res: {status: (arg0: number) => {(): any; new(): any; json: {(arg0: any): void; new(): any;};};}) => {
+whiskys.get('/', <MiddlewareFn>function(req, res) {
   pool.query('SELECT * FROM whiskys', (error: any, results: {rows: any;}) => {
     if (error) {
       throw error
@@ -38,7 +40,7 @@ whiskys.get('/', (req: any, res: {status: (arg0: number) => {(): any; new(): any
   })
 });
 
-whiskys.get('/:type', (req: any, res: {status: (arg0: number) => {(): any; new(): any; json: {(arg0: any): void; new(): any;};};}) => {
+whiskys.get('/:type', <MiddlewareFn>function(req, res) {
 
   const type = req.params.type;
 

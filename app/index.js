@@ -1,3 +1,5 @@
+"use strict";
+exports.__esModule = true;
 var express = require('express');
 var fs = require('fs');
 var helmet = require('helmet');
@@ -17,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 whiskys.use(lib.logResponse);
 app.get('/', function (req, res) {
-    res.send('Welcome to the JSON Manipulator. Navigate to \'/whiskys\' to view the current JSON data.');
+    res.send('Welcome to the Whiskey Store. Navigate to \'/whiskys\' to view the current JSON data.');
 });
 whiskys.get('/', function (req, res) {
     pool.query('SELECT * FROM whiskys', function (error, results) {
