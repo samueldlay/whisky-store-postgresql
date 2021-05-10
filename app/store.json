@@ -1,0 +1,16 @@
+{
+  "whiskys": {
+    "scotch": [
+      "Glen"
+    ],
+    "japanese": [
+      "Nikka"
+    ],
+    "irish": [
+      "Tullamore"
+    ],
+    "bourbon": [
+      "Makers"
+    ]
+  }
+}
