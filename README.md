@@ -1,5 +1,5 @@
 # whisky-store-psql
-A backend API that creates, reads, updates, and deletes values from a JSON file that contains four whisky types.
+A backend API that creates, reads, updates, and deletes values from a PostgreSQL Database.
 
 ## Installation
 
