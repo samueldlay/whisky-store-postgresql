@@ -14,10 +14,12 @@ var whiskys = express.Router();
 app.use('/whiskys', whiskys);
 app.use(helmet());
 app.use(lib.logResponse);
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 whiskys.use(lib.logResponse);
+whiskys.use(express.json());
+whiskys.use(express.urlencoded({ extended: true }));
 app.get('/', function (req, res) {
     res.send('Welcome to the Whiskey Store. Navigate to \'/whiskys\' to view the current JSON data.');
 });
@@ -29,33 +31,27 @@ whiskys.get('/', function (req, res) {
         res.status(200).json(results.rows);
     });
 });
-whiskys.get('/:type', function (req, res) {
-    var type = req.params.type;
+whiskys.post('/', function (req, res) {
+    var type = req.body.type;
     pool.query('SELECT * FROM whiskys WHERE type = ($1)', [type], function (error, results) {
         if (error) {
-            throw error;
+            return res.status(500).send(error);
         }
         res.status(200).json(results.rows);
     });
 });
-// whiskys.put('/:type', (req: {query: any; params: {type: string;};}, res: {status: (arg0: number) => {(): any; new(): any; send: {(arg0: string): any; new(): any;};};}) => {
-//   const updatedType = req.query;
-//   fs.readFile('./store.json', (err: any, data: string) => {
-//     if (err) console.log(err);
-//     const parsedData = JSON.parse(data);
-//     const foundType = Object.keys(parsedData.whiskys).find(type => req.params.type === type);
-//     if (foundType) {
-//       const foundName = parsedData.whiskys[foundType].indexOf(updatedType.name);
-//       if (foundName !== -1) {
-//         parsedData.whiskys[foundType][foundName] = updatedType.update;
-//         const stringified = JSON.stringify(parsedData, null, 2);
-//         return helpers.writeNewJson(req, res, stringified);
-//       }
-//       else return res.status(404).send('That whiskey name does not exist');
-//     }
-//     else return res.status(404).send('That type of whisky does not exist');
-//   });
-// });
+whiskys.post('/add', function (req, res) {
+    var updatedType = req.body;
+    var _a = req.body, type = _a.type, name = _a.name;
+    var value = req.body.value;
+    console.log('UPDATED:', updatedType);
+    pool.query('INSERT INTO whiskys (type, value, name) values ($1, $2, $3)', [type, value, name], function (error, results) {
+        if (error) {
+            return res.status(500).send(error);
+        }
+        res.status(200).json({ status: 'success', message: 'Whisky added.' });
+    });
+});
 // whiskys.post('/', (req: {query: any;}, res: {status: (arg0: number) => {(): any; new(): any; send: {(arg0: string | undefined): void; new(): any;};};}) => {
 //   const newWhiskey = req.query;
 //   const validQuery = Object.keys(newWhiskey).includes('type') && Object.keys(newWhiskey).includes('name');

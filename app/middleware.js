@@ -1,9 +1,12 @@
-var logResponse = function (req, res, next) {
+"use strict";
+exports.__esModule = true;
+exports.logResponse = void 0;
+function logResponse(req, res, next) {
     res.on('finish', function () {
-        console.log('Params: ', req.params);
-        console.log('Query: ', req.query);
+        console.log('Body: ', req.body);
         console.log("Responded with status " + res.statusCode);
     });
     next();
-};
-module.exports = { logResponse: logResponse };
+}
+exports.logResponse = logResponse;
+;
