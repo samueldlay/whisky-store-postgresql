@@ -7,8 +7,7 @@ var lib = require('./middleware');
 var helpers = require('./helpers');
 var bodyParser = require('body-parser');
 var cors = require('cors');
-var _a = require('./config'), pool = _a.pool, client = _a.client;
-client.connect();
+var pool = require('./config').pool;
 var app = express();
 var PORT = process.env.PORT || 3000;
 var whiskys = express.Router();
@@ -25,7 +24,7 @@ app.get('/', function (req, res) {
     res.send('Welcome to the Whiskey Store. Navigate to \'/whiskys\' to view the current JSON data.');
 });
 whiskys.get('/', function (req, res) {
-    client.query('SELECT * FROM whiskys', function (error, results) {
+    pool.query('SELECT * FROM whiskys', function (error, results) {
         if (error) {
             throw error;
         }
@@ -34,7 +33,7 @@ whiskys.get('/', function (req, res) {
 });
 whiskys.post('/', function (req, res) {
     var type = req.body.type;
-    client.query('SELECT * FROM whiskys WHERE type = ($1)', [type], function (error, results) {
+    pool.query('SELECT * FROM whiskys WHERE type = ($1)', [type], function (error, results) {
         if (error) {
             return res.status(500).send(error);
         }
@@ -46,7 +45,7 @@ whiskys.post('/add', function (req, res) {
     var _a = req.body, type = _a.type, name = _a.name;
     var value = req.body.value;
     console.log('UPDATED:', updatedType);
-    client.query('INSERT INTO whiskys (type, value, name) values ($1, $2, $3)', [type, value, name], function (error, results) {
+    pool.query('INSERT INTO whiskys (type, value, name) values ($1, $2, $3)', [type, value, name], function (error, results) {
         if (error) {
             return res.status(500).send(error);
         }
