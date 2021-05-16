@@ -5,9 +5,10 @@ const lib = require('./middleware');
 const helpers = require('./helpers');
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const {pool} = require('./config')
+const {pool, client} = require('./config')
 import {MiddlewareFn} from './my-types'
 
+client.connect();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,7 +35,7 @@ app.get('/', <MiddlewareFn>function(req, res) {
 });
 
 whiskys.get('/', <MiddlewareFn>function(req, res) {
-  pool.query('SELECT * FROM whiskys', (error: any, results: {rows: any;}) => {
+  client.query('SELECT * FROM whiskys', (error: any, results: {rows: any;}) => {
     if (error) {
       throw error
     }
@@ -46,7 +47,7 @@ whiskys.post('/', <MiddlewareFn>function(req, res) {
 
   const type = req.body.type;
 
-  pool.query('SELECT * FROM whiskys WHERE type = ($1)', [type], (error: any, results: {rows: any;}) => {
+  client.query('SELECT * FROM whiskys WHERE type = ($1)', [type], (error: any, results: {rows: any;}) => {
     if (error) {
       return res.status(500).send(error);
     }
@@ -60,7 +61,7 @@ whiskys.post('/add', <MiddlewareFn>function(req, res) {
   const value = req.body.value;
   console.log('UPDATED:', updatedType);
 
-  pool.query('INSERT INTO whiskys (type, value, name) values ($1, $2, $3)', [type, value, name], (error: any, results: {rows: any;}) => {
+  client.query('INSERT INTO whiskys (type, value, name) values ($1, $2, $3)', [type, value, name], (error: any, results: {rows: any;}) => {
     if (error) {
       return res.status(500).send(error);
     }

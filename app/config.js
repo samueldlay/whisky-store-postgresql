@@ -1,5 +1,12 @@
 "use strict";
 exports.__esModule = true;
+var Client = require('pg').Client;
+var client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
 require('dotenv').config();
 var Pool = require('pg').Pool;
 var isProduction = process.env.NODE_ENV === 'production';
@@ -8,4 +15,4 @@ var pool = new Pool({
     connectionString: isProduction ? process.env.DATABASE_URL : connectionString,
     ssl: isProduction
 });
-module.exports = { pool: pool };
+module.exports = { pool: pool, client: client };

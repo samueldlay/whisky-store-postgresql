@@ -1,4 +1,13 @@
 export {};
+const { Client } = require('pg');
+
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
 
 require('dotenv').config();
 
@@ -12,4 +21,4 @@ const pool = new Pool({
   ssl: isProduction,
 });
 
-module.exports = {pool};
+module.exports = {pool, client};
