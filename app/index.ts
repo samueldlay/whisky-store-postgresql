@@ -1,9 +1,6 @@
 const express = require('express');
-const fs = require('fs');
 const helmet = require('helmet');
 const lib = require('./middleware');
-const helpers = require('./helpers');
-const bodyParser = require('body-parser')
 const cors = require('cors')
 const {client, pool} = require('./config')
 import {MiddlewareFn} from './my-types'
