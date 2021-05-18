@@ -37,6 +37,7 @@ app.use(cors());
 whiskys.use(lib.logResponse);
 whiskys.use(express.json());
 whiskys.use(express.urlencoded({extended: true}))
+whiskys.use(cors());
 
 app.get('/', <MiddlewareFn>function(req, res) {
   res.send('Welcome to the Whiskey Store. Navigate to \'/whiskys\' to view the current JSON data.');
