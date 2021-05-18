@@ -5,9 +5,18 @@ const lib = require('./middleware');
 const helpers = require('./helpers');
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const {pool} = require('./config')
+const {client, pool} = require('./config')
 import {MiddlewareFn} from './my-types'
 
+// client.connect();
+
+// client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err: any, res: {rows: any}) => {
+//   if (err) throw err;
+//   for (let row of res.rows) {
+//     console.log(JSON.stringify(row));
+//   }
+//   client.end();
+// });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +41,19 @@ whiskys.use(express.urlencoded({extended: true}))
 app.get('/', <MiddlewareFn>function(req, res) {
   res.send('Welcome to the Whiskey Store. Navigate to \'/whiskys\' to view the current JSON data.');
 });
+
+app.get('/db', async function(req: any, res: any) {
+  try {
+    const client = await pool.connect();
+    const result = await client.query('SELECT * FROM whiskys');
+    const results = { 'results': (result) ? result.rows : null};
+    res.render('pages/db', results );
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+})
 
 whiskys.get('/', <MiddlewareFn>function(req, res) {
   pool.query('SELECT * FROM whiskys', (error: any, results: {rows: any;}) => {
