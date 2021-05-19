@@ -37,11 +37,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var express = require('express');
-var fs = require('fs');
 var helmet = require('helmet');
 var lib = require('./middleware');
-var helpers = require('./helpers');
-var bodyParser = require('body-parser');
 var cors = require('cors');
 var _a = require('./config'), client = _a.client, pool = _a.pool;
 // client.connect();
