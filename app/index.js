@@ -98,7 +98,7 @@ app.get('/db', function (req, res) {
     });
 });
 whiskys.get('/', function (req, res) {
-    pool.query('SELECT * FROM whiskys ORDER BY id DESC', function (error, results) {
+    pool.query('SELECT * FROM whiskys ORDER BY id ASC', function (error, results) {
         if (error) {
             throw error;
         }

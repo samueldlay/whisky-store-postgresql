@@ -55,7 +55,7 @@ app.get('/db', async function(req: any, res: any) {
 })
 
 whiskys.get('/', <MiddlewareFn>function(req, res) {
-  pool.query('SELECT * FROM whiskys ORDER BY id DESC', (error: any, results: {rows: any;}) => {
+  pool.query('SELECT * FROM whiskys ORDER BY id ASC', (error: any, results: {rows: any;}) => {
     if (error) {
       throw error
     }
