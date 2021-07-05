@@ -35,6 +35,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
 exports.__esModule = true;
 var express = require('express');
 var helmet = require('helmet');
@@ -93,7 +98,7 @@ app.get('/db', function (req, res) {
     });
 });
 whiskys.get('/', function (req, res) {
-    pool.query('SELECT * FROM whiskys', function (error, results) {
+    pool.query('SELECT * FROM whiskys ORDER BY id DESC', function (error, results) {
         if (error) {
             throw error;
         }
@@ -108,6 +113,46 @@ whiskys.post('/', function (req, res) {
         }
         res.status(200).json(results.rows);
     });
+});
+whiskys.post('/id', function (req, res) {
+    var id = req.body.id;
+    pool.query('SELECT * FROM whiskys WHERE id = ($1)', [id], function (error, results) {
+        if (error) {
+            return res.status(500).send(error);
+        }
+        res.status(200).json(results.rows);
+    });
+});
+whiskys.post('/update', function (req, res) {
+    var body = req.body;
+    var bodyVals = Object.values(body);
+    var bodyKeys = Object.keys(body);
+    var valuesWithID = Array.from(new Set(__spreadArray(__spreadArray([], bodyVals), [body.id])));
+    var keysWithID = Array.from(new Set(__spreadArray(__spreadArray([], bodyKeys), [body.id])));
+    var mapKeysToQuery = keysWithID.map(function (prop, index) {
+        if (index < keysWithID.length)
+            return "WHERE id = $" + (index + 1) + ";";
+        else if (index === keysWithID.length - 2)
+            return prop + " = $" + (index + 1);
+        return prop + " = $" + (index + 1) + ",";
+    });
+    var joinedQueries = "UPDATE whiskys SET " + mapKeysToQuery.join(' ');
+    // const query = `UPDATE whiskys SET WHERE id = ${valuesWithID[valuesWithID.length - 1]}`;
+    // for (const property in body) {
+    // }
+    // pool.query(joinedQueries, bodyVals, (error: any, results: {rows: any;}) => {
+    //   if (error) {
+    //     return res.status(500).send(error);
+    //   }
+    //   res.status(200).json(results.rows);
+    // })
+    // pool.query('SELECT * FROM whiskys WHERE id = ($1)', [id], (error: any, results: {rows: any;}) => {
+    //   if (error) {
+    //     return res.status(500).send(error);
+    //   }
+    //   res.status(200).json(results.rows);
+    // })
+    res.status(200).send(joinedQueries);
 });
 whiskys.post('/add', function (req, res) {
     var updatedType = req.body;

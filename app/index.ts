@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const lib = require('./middleware');
 const cors = require('cors')
 const {client, pool} = require('./config')
+import {response} from 'express';
 import {MiddlewareFn} from './my-types'
 
 // client.connect();
@@ -54,7 +55,7 @@ app.get('/db', async function(req: any, res: any) {
 })
 
 whiskys.get('/', <MiddlewareFn>function(req, res) {
-  pool.query('SELECT * FROM whiskys', (error: any, results: {rows: any;}) => {
+  pool.query('SELECT * FROM whiskys ORDER BY id DESC', (error: any, results: {rows: any;}) => {
     if (error) {
       throw error
     }
@@ -72,6 +73,58 @@ whiskys.post('/', <MiddlewareFn>function(req, res) {
     }
     res.status(200).json(results.rows);
   })
+});
+
+whiskys.post('/id', <MiddlewareFn>function(req, res) {
+
+  const id = req.body.id;
+
+  pool.query('SELECT * FROM whiskys WHERE id = ($1)', [id], (error: any, results: {rows: any;}) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    res.status(200).json(results.rows);
+  })
+});
+
+whiskys.post('/update', <MiddlewareFn>function(req, res) {
+  type IdType = {id: number};
+
+  const body = req.body;
+  const bodyVals = Object.values(body);
+  const bodyKeys = Object.keys(body);
+  const valuesWithID = Array.from(new Set([...bodyVals, body.id]));
+  const keysWithID = Array.from(new Set([...bodyKeys, body.id]));
+
+  const mapKeysToQuery: string[] = keysWithID.map((prop, index) => {
+    if (index < keysWithID.length) return `WHERE id = $${index + 1};`;
+    else if (index === keysWithID.length - 2) return `${prop} = $${index + 1}`;
+    return `${prop} = $${index + 1},`;
+  });
+
+  const joinedQueries = `UPDATE whiskys SET ${mapKeysToQuery.join(' ')}`;
+
+  // const query = `UPDATE whiskys SET WHERE id = ${valuesWithID[valuesWithID.length - 1]}`;
+
+  // for (const property in body) {
+    
+  // }
+
+  // pool.query(joinedQueries, bodyVals, (error: any, results: {rows: any;}) => {
+  //   if (error) {
+  //     return res.status(500).send(error);
+  //   }
+  //   res.status(200).json(results.rows);
+  // })
+
+  // pool.query('SELECT * FROM whiskys WHERE id = ($1)', [id], (error: any, results: {rows: any;}) => {
+  //   if (error) {
+  //     return res.status(500).send(error);
+  //   }
+  //   res.status(200).json(results.rows);
+  // })
+
+  res.status(200).send(joinedQueries);
 });
 
 whiskys.post('/add', <MiddlewareFn>function(req, res) {
