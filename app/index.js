@@ -35,11 +35,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
-};
 exports.__esModule = true;
 var express = require('express');
 var helmet = require('helmet');
@@ -124,40 +119,21 @@ whiskys.post('/id', function (req, res) {
     });
 });
 whiskys.post('/update', function (req, res) {
-    var body = req.body;
-    var bodyVals = Object.values(body);
-    var bodyKeys = Object.keys(body);
-    var valuesWithID = Array.from(new Set(__spreadArray(__spreadArray([], bodyVals), [body.id])));
-    var keysWithID = Array.from(new Set(__spreadArray(__spreadArray([], bodyKeys), [body.id])));
-    var mapKeysToQuery = keysWithID.map(function (prop, index) {
-        if (index < keysWithID.length)
-            return "WHERE id = $" + (index + 1) + ";";
-        else if (index === keysWithID.length - 2)
-            return prop + " = $" + (index + 1);
-        return prop + " = $" + (index + 1) + ",";
-    });
-    var joinedQueries = "UPDATE whiskys SET " + mapKeysToQuery.join(' ');
-    // const query = `UPDATE whiskys SET WHERE id = ${valuesWithID[valuesWithID.length - 1]}`;
-    // for (const property in body) {
-    // }
-    // pool.query(joinedQueries, bodyVals, (error: any, results: {rows: any;}) => {
-    //   if (error) {
-    //     return res.status(500).send(error);
-    //   }
-    //   res.status(200).json(results.rows);
-    // })
-    // pool.query('SELECT * FROM whiskys WHERE id = ($1)', [id], (error: any, results: {rows: any;}) => {
-    //   if (error) {
-    //     return res.status(500).send(error);
-    //   }
-    //   res.status(200).json(results.rows);
-    // })
-    res.status(200).send(joinedQueries);
+    var _a = req.body, type = _a.type, value = _a.value, name = _a.name;
+    var id = req.body.id;
+    if (id) {
+        pool.query('UPDATE whiskys SET type = $1, value = $2, name = $3 WHERE id = $4', [type, value, name, id], function (error, results) {
+            if (error) {
+                return res.status(500).send(error);
+            }
+            res.status(200).json({ status: 'success', message: 'Whisky updated.' });
+        });
+    }
 });
 whiskys.post('/add', function (req, res) {
     var updatedType = req.body;
-    var _a = req.body, type = _a.type, name = _a.name;
-    var value = req.body.value;
+    var _a = req.body, type = _a.type, name = _a.name, value = _a.value;
+    // const value = req.body.value;
     console.log('UPDATED:', updatedType);
     pool.query('INSERT INTO whiskys (type, value, name) values ($1, $2, $3)', [type, value, name], function (error, results) {
         if (error) {
@@ -166,31 +142,13 @@ whiskys.post('/add', function (req, res) {
         res.status(200).json({ status: 'success', message: 'Whisky added.' });
     });
 });
-// whiskys.post('/', (req: {query: any;}, res: {status: (arg0: number) => {(): any; new(): any; send: {(arg0: string | undefined): void; new(): any;};};}) => {
-//   const newWhiskey = req.query;
-//   const validQuery = Object.keys(newWhiskey).includes('type') && Object.keys(newWhiskey).includes('name');
-//   if (validQuery) {
-//     fs.readFile('./store.json', (err: any, data: string) => {
-//       if (err) console.log(err);
-//       const parsedData = JSON.parse(data);
-//       if (typeof newWhiskey.name === 'object') parsedData.whiskys[newWhiskey.type] = [...parsedData.whiskys[newWhiskey.type],...newWhiskey.name];
-//       else if (typeof newWhiskey.name === 'string') parsedData.whiskys[newWhiskey.type] = [...parsedData.whiskys[newWhiskey.type], newWhiskey.name];
-//       else return res.status(500).send('Invalid parameters');
-//       const stringified = JSON.stringify(parsedData, null, 2);
-//       helpers.writeNewJson(req, res, stringified);
-//     });
-//   }
-//   else res.status(500).send('Not valid parameters');
-// });
-// whiskys.delete('/:type', (req: {params: {type: string;}; query: {name: any;};}, res: {status: (arg0: number) => {(): any; new(): any; send: {(arg0: string): any; new(): any;};};}) => {
-//   fs.readFile('./store.json', (err: any, data: string) => {
-//     if (err) console.log(err);
-//     const parsedData = JSON.parse(data);
-//     const foundType = Object.keys(parsedData.whiskys).indexOf(req.params.type);
-//     if (foundType !== -1) parsedData.whiskys[req.params.type].splice(req.query.name, 1);
-//     else return res.status(404).send('That type of whisky does not exist');
-//     const stringified = JSON.stringify(parsedData, null, 2);
-//     helpers.writeNewJson(req, res, stringified);
-//   });
-// });
+whiskys["delete"]('/delete', function (req, res) {
+    var id = req.body.id;
+    pool.query('DELETE FROM whiskys WHERE id = $1', [id], function (error, results) {
+        if (error) {
+            return res.status(500).send(error);
+        }
+        res.status(200).json({ status: 'success', message: 'Whisky deleted.' });
+    });
+});
 app.listen(PORT, function () { return console.log("listening on port " + PORT); });
