@@ -62,13 +62,47 @@ interface BodyTypes {
 }
 
 whiskys.get('/', <MiddlewareFn>function(req, res) {
-  pool.query('SELECT * FROM whiskys ORDER BY id ASC', (error: any, results: {rows: any;}) => {
+  const {pageIndex} = req.body;
+
+  const limit = 2;
+  const offset = limit * pageIndex;
+
+  pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
     if (error) {
       throw error
     }
-    res.status(200).json(results.rows)
+    console.log('Results:', results);
+    res.status(200).json(results.rows);
+  });
+});
+
+whiskys.get('/count', <MiddlewareFn>function(req, res) {
+  pool.query('SELECT COUNT(*) FROM whiskys', (error: any, results: {rows: any;}) => {
+    if (error) {
+      throw error
+    }
+    console.log('Results:', results);
+    res.status(200).send(results.rows[0].count);
   })
 });
+
+whiskys.get('/limit', <MiddlewareFn>function(req, res) {
+
+  const {pageIndex} = req.body;
+
+  const limit = 2;
+  const offset = limit * pageIndex;
+
+  pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
+    if (error) {
+      throw error
+    }
+    console.log('Results:', results);
+    res.status(200).json(results.rows);
+  });
+});
+
+
 
 whiskys.post('/', <MiddlewareFn>function(req, res) {
 
