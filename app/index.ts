@@ -65,7 +65,7 @@ whiskys.get('/', <MiddlewareFn>function(req, res) {
   const {pageIndex} = req.body;
 
   const limit = 2;
-  const offset = limit * pageIndex;
+  const offset = limit * Number(pageIndex);
 
   pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
     if (error) {
