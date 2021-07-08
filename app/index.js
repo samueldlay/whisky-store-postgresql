@@ -92,7 +92,7 @@ app.get('/db', function (req, res) {
         });
     });
 });
-whiskys.get('/', function (req, res) {
+whiskys.post('/', function (req, res) {
     var pageIndex = req.body.pageIndex;
     var limit = 2;
     var offset = limit * Number(pageIndex);

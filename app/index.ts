@@ -61,7 +61,7 @@ interface BodyTypes {
   name?: string;
 }
 
-whiskys.get('/', <MiddlewareFn>function(req, res) {
+whiskys.post('/', <MiddlewareFn>function(req, res) {
   const {pageIndex} = req.body;
 
   const limit = 2;
