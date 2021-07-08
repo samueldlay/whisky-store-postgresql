@@ -93,10 +93,14 @@ app.get('/db', function (req, res) {
     });
 });
 whiskys.get('/', function (req, res) {
-    pool.query('SELECT * FROM whiskys ORDER BY id ASC', function (error, results) {
+    var pageIndex = req.body.pageIndex;
+    var limit = 2;
+    var offset = limit * Number(pageIndex);
+    pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], function (error, results) {
         if (error) {
             throw error;
         }
+        console.log('Results:', results);
         res.status(200).json(results.rows);
     });
 });
