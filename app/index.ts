@@ -94,7 +94,7 @@ whiskys.post('/id', <MiddlewareFn>function(req, res) {
   })
 });
 
-whiskys.post('/update', <MiddlewareFn>function(req, res) {
+whiskys.put('/update', <MiddlewareFn>function(req, res) {
   type IdType = {id: number};
 
   const {type, value, name}: BodyTypes = req.body;

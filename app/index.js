@@ -118,7 +118,7 @@ whiskys.post('/id', function (req, res) {
         res.status(200).json(results.rows);
     });
 });
-whiskys.post('/update', function (req, res) {
+whiskys.put('/update', function (req, res) {
     var _a = req.body, type = _a.type, value = _a.value, name = _a.name;
     var id = req.body.id;
     if (id) {
