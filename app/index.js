@@ -92,11 +92,12 @@ app.get('/db', function (req, res) {
         });
     });
 });
-whiskys.post('/', function (req, res) {
-    var pageIndex = req.body.pageIndex;
+// COUNT(*) OVER()
+whiskys.get('/', function (req, res) {
+    var pageIndex = req.query.pageIndex;
     var limit = 2;
     var offset = limit * Number(pageIndex);
-    pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], function (error, results) {
+    pool.query('SELECT ID, type, value, name, COUNT(*) OVER() AS total FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], function (error, results) {
         if (error) {
             throw error;
         }
@@ -104,27 +105,27 @@ whiskys.post('/', function (req, res) {
         res.status(200).json(results.rows);
     });
 });
-whiskys.get('/count', function (req, res) {
-    pool.query('SELECT COUNT(*) FROM whiskys', function (error, results) {
-        if (error) {
-            throw error;
-        }
-        console.log('Results:', results);
-        res.status(200).send(results.rows[0].count);
-    });
-});
-whiskys.get('/limit', function (req, res) {
-    var pageIndex = req.body.pageIndex;
-    var limit = 2;
-    var offset = limit * pageIndex;
-    pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], function (error, results) {
-        if (error) {
-            throw error;
-        }
-        console.log('Results:', results);
-        res.status(200).json(results.rows);
-    });
-});
+// whiskys.get('/count', <MiddlewareFn>function(req, res) {
+//   pool.query('SELECT COUNT(*) FROM whiskys', (error: any, results: {rows: any;}) => {
+//     if (error) {
+//       throw error
+//     }
+//     console.log('Results:', results);
+//     res.status(200).send(results.rows[0].count);
+//   })
+// });
+// whiskys.get('/limit', <MiddlewareFn>function(req, res) {
+//   const {pageIndex} = req.body;
+//   const limit = 2;
+//   const offset = limit * pageIndex;
+//   pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
+//     if (error) {
+//       throw error
+//     }
+//     console.log('Results:', results);
+//     res.status(200).json(results.rows);
+//   });
+// });
 whiskys.post('/', function (req, res) {
     var type = req.body.type;
     pool.query('SELECT * FROM whiskys WHERE type = ($1)', [type], function (error, results) {

@@ -60,14 +60,14 @@ interface BodyTypes {
   value?: number;
   name?: string;
 }
-
-whiskys.post('/', <MiddlewareFn>function(req, res) {
-  const {pageIndex} = req.body;
-
+// COUNT(*) OVER()
+whiskys.get('/', <MiddlewareFn>function(req, res) {
+  const {pageIndex} = req.query;
+  
   const limit = 2;
   const offset = limit * Number(pageIndex);
 
-  pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
+  pool.query('SELECT ID, type, value, name, COUNT(*) OVER() AS total FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
     if (error) {
       throw error
     }
@@ -76,31 +76,31 @@ whiskys.post('/', <MiddlewareFn>function(req, res) {
   });
 });
 
-whiskys.get('/count', <MiddlewareFn>function(req, res) {
-  pool.query('SELECT COUNT(*) FROM whiskys', (error: any, results: {rows: any;}) => {
-    if (error) {
-      throw error
-    }
-    console.log('Results:', results);
-    res.status(200).send(results.rows[0].count);
-  })
-});
+// whiskys.get('/count', <MiddlewareFn>function(req, res) {
+//   pool.query('SELECT COUNT(*) FROM whiskys', (error: any, results: {rows: any;}) => {
+//     if (error) {
+//       throw error
+//     }
+//     console.log('Results:', results);
+//     res.status(200).send(results.rows[0].count);
+//   })
+// });
 
-whiskys.get('/limit', <MiddlewareFn>function(req, res) {
+// whiskys.get('/limit', <MiddlewareFn>function(req, res) {
 
-  const {pageIndex} = req.body;
+//   const {pageIndex} = req.body;
 
-  const limit = 2;
-  const offset = limit * pageIndex;
+//   const limit = 2;
+//   const offset = limit * pageIndex;
 
-  pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
-    if (error) {
-      throw error
-    }
-    console.log('Results:', results);
-    res.status(200).json(results.rows);
-  });
-});
+//   pool.query('SELECT * FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
+//     if (error) {
+//       throw error
+//     }
+//     console.log('Results:', results);
+//     res.status(200).json(results.rows);
+//   });
+// });
 
 
 
