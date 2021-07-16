@@ -62,18 +62,29 @@ interface BodyTypes {
 }
 // COUNT(*) OVER()
 whiskys.get('/', <MiddlewareFn>function(req, res) {
-  const {pageIndex} = req.query;
+  const {pageIndex, itemLimit} = req.query;
   
-  const limit = 2;
-  const offset = limit * Number(pageIndex);
+  // const limit = 2;
+  try {
 
-  pool.query('SELECT ID, type, value, name, COUNT(*) OVER() AS total FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
-    if (error) {
-      throw error
+    if (typeof itemLimit === 'string' && typeof pageIndex === 'string') {
+      const limit = Number(itemLimit)
+      const offset = Number(limit) * Number(pageIndex);
+    
+      pool.query('SELECT ID, type, value, name, COUNT(*) OVER() AS total FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], (error: any, results: {rows: any;}) => {
+        if (error) {
+          throw error
+        }
+        console.log('Results:', results);
+        res.status(200).json(results.rows);
+      });
     }
-    console.log('Results:', results);
-    res.status(200).json(results.rows);
-  });
+    else throw new Error('Request Query Error: ');
+  }
+  catch (exc) {
+    console.log(exc);
+    return exc;
+  }
 });
 
 // whiskys.get('/count', <MiddlewareFn>function(req, res) {

@@ -94,16 +94,27 @@ app.get('/db', function (req, res) {
 });
 // COUNT(*) OVER()
 whiskys.get('/', function (req, res) {
-    var pageIndex = req.query.pageIndex;
-    var limit = 2;
-    var offset = limit * Number(pageIndex);
-    pool.query('SELECT ID, type, value, name, COUNT(*) OVER() AS total FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], function (error, results) {
-        if (error) {
-            throw error;
+    var _a = req.query, pageIndex = _a.pageIndex, itemLimit = _a.itemLimit;
+    // const limit = 2;
+    try {
+        if (typeof itemLimit === 'string' && typeof pageIndex === 'string') {
+            var limit = Number(itemLimit);
+            var offset = Number(limit) * Number(pageIndex);
+            pool.query('SELECT ID, type, value, name, COUNT(*) OVER() AS total FROM whiskys ORDER BY id ASC LIMIT $1 OFFSET $2;', [limit, offset], function (error, results) {
+                if (error) {
+                    throw error;
+                }
+                console.log('Results:', results);
+                res.status(200).json(results.rows);
+            });
         }
-        console.log('Results:', results);
-        res.status(200).json(results.rows);
-    });
+        else
+            throw new Error('Request Query Error: ');
+    }
+    catch (exc) {
+        console.log(exc);
+        return exc;
+    }
 });
 // whiskys.get('/count', <MiddlewareFn>function(req, res) {
 //   pool.query('SELECT COUNT(*) FROM whiskys', (error: any, results: {rows: any;}) => {
